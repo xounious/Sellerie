@@ -34,12 +34,17 @@ class AppFixtures extends Fixture
         }
 
         //ajout de 20 employés dont 1 administrateur
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 19; $i++) {
             $employee = new Employee();
-            $employee->setEmail($faker->email);
+            if ($i === 0) {
+                // email de test rapide
+                $employee->setEmail('test@test.fr');
+            } else {
+                $employee->setEmail($faker->email);
+            }
             $employee->setFirstname($faker->firstName);
             $employee->setLastname($faker->lastName);
-            $employee->setPassword('password');
+            $employee->setPassword(password_hash('password', PASSWORD_BCRYPT));
             if ($i === 0) {
                 $employee->setRoles(['ROLE_ADMIN']);
             } else {
