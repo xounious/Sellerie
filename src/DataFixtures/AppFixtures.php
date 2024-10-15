@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use Faker\Factory;
+use App\Entity\Loan;
 use App\Entity\Status;
 use App\Entity\Storage;
 use App\Entity\Borrower;
@@ -131,8 +132,19 @@ class AppFixtures extends Fixture
         }
 
         // ###########################################
-        //       
+        //       ajout des Prêts
         // ###########################################
+        $loans = [];
+        for ($i = 0; $i < 100; $i++) {
+            $loan = new Loan();
+            $startDate = $faker->dateTimeBetween('-1 months', '+3 months');
+            $loan->setStartDate($startDate);
+            $loan->setEndDate($faker->dateTimeBetween($startDate, '+5 months'));
+            $loan->setBorrower($borrowers[$faker->numberBetween(0, 19)]);
+            $loan->setEquipment($equipment[$faker->numberBetween(0, 999)]);
+            $loans[] = $loan;
+            $manager->persist($loan);
+        }
 
 
 
