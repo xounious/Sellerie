@@ -19,8 +19,8 @@ class Storage
     #[ORM\JoinColumn(nullable: false)]
     private ?Building $building = null;
 
-    #[ORM\ManyToOne(inversedBy: 'storages')]
-    private ?Lane $lane = null;
+    #[ORM\Column]
+    private ?int $laneNumber = null;
 
     /**
      * @var Collection<int, Equipment>
@@ -50,14 +50,14 @@ class Storage
         return $this;
     }
 
-    public function getLane(): ?Lane
+    public function getLaneNumber(): ?int
     {
-        return $this->lane;
+        return $this->laneNumber;
     }
 
-    public function setLane(?Lane $lane): static
+    public function setLaneNumber(?int $laneNumber): static
     {
-        $this->lane = $lane;
+        $this->laneNumber = $laneNumber;
 
         return $this;
     }
