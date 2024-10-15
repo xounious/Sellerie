@@ -25,7 +25,11 @@
                     <td class="px-6 py-4 mx-2">{{ equipment.stockQuantity }}</td>
                     <td class="px-6 py-4 mx-2">{{ equipment.category.name }}</td>
                     <td class="px-6 py-4 mx-2">{{ equipment.status.name }}</td>
-                    <td class="px-6 py-4 mx-2">{{ equipment.storage.building.name }} - Rayon {{ equipment.storage.laneNumber}}</td>
+                    {% if equipment.storage %}
+                        <td class="px-6 py-4 mx-2">{{ equipment.storage.building.name }} - Rayon {{ equipment.storage.laneNumber}}</td>
+                    {% else %}
+                        <td class="px-6 py-4 mx-2">Pas de stockage</td>
+                    {% endif %}
                     <td class="px-6 py-4 mx-2">
                         <a href="{{ path('app_equipment_show', {'id': equipment.id}) }}">show</a>
                         <a href="{{ path('app_equipment_edit', {'id': equipment.id}) }}">edit</a>

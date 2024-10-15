@@ -11,6 +11,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class EquipmentType extends AbstractType
 {
@@ -36,6 +37,9 @@ class EquipmentType extends AbstractType
                         ->orderBy('t.name', 'ASC');
                 },
                 'choice_label' => 'name',
+            ])
+            ->add('save', SubmitType::class, [
+                'label' => 'Ajouter l\'équipement',
             ]);
     }
 

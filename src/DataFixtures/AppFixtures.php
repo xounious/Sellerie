@@ -120,7 +120,7 @@ class AppFixtures extends Fixture
         // ###########################################
         $sizes = ['S', 'M', 'L', 'XL', 'XXL'];
         $equipments = [];
-        for ($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $equipment = new Equipment();
             $equipment->setStorage($storages[$faker->numberBetween(0, 14)]);
             $equipment->setStatus($status[$faker->numberBetween(0, 5)]);
@@ -143,7 +143,7 @@ class AppFixtures extends Fixture
             $loan->setStartDate($startDate);
             $loan->setEndDate($faker->dateTimeBetween($startDate, '+5 months'));
             $loan->setBorrower($borrowers[$i%19]);
-            $loan->setEquipment($equipments[$faker->numberBetween(0, 999)]);
+            $loan->setEquipment($equipments[$faker->numberBetween(0, 99)]);
             $loans[] = $loan;
             $manager->persist($loan);
         }
