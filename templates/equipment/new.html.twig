@@ -11,7 +11,40 @@
         {{ form_row(form.stockQuantity) }}
         {{ form_row(form.category) }}
         {{ form_row(form.status) }}
+        <button type="button" onclick="document.getElementById('storage').style.display = 'block';">Sélectionner le stockage</button>
+        <div id="storage" style="display: block;">
+            {{ form_start(formStorage) }}
+                {{ form_row(formStorage.building) }}
+                {{ form_row(formStorage.laneNumber) }}
+            {{ form_end(formStorage) }}
+            <div id="containerStorage" class="relative">
+                <div id="equipment" class="absolute bottom-1 left-1/2 transform -translate-x-1/2 rounded bg-orange-300  hover:cursor-move p-5 z-10 shadow-md ">
+                    <p>Nom</p>
+                    <p>Taille</p>
+                    <p>Quantité</p>
+                </div>
+                <div id="buildings" class="flex w-full justify-around bg-slate-300 rounded pb-32 pt-3 h-64 space-x-10 px-10">
+                {% for building in buildings %}
+                    <div id="{{ building.name }}" class="building flex-1 bg-orange-100 z-10 p-2 rounded">
+                        <button class="changeBuilding" class="rounded-sm bg-orange-600 text-white shadow-sm" style="display: none;">Changer de bâtiment</button>
+                        <p class="text-sm text-orange-950 text-center">{{ building.name }}</p>
+                        <div class="emplacements" class="w-80 border-2 rounded" style="display: none;">
+                        {% for laneLetter in laneLettersGroupedByBuilding[building.getId()] %}
+                            <div class="lane" id="{{ laneLetter }}">
+                                <p class="text-sm text-center text-orange-950 w-fit">{{ laneLetter }}</p>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+        {{ form_row(form.save)}}
     {{ form_end(form) }}
 
     <a href="{{ path('app_equipment_index') }}">back to list</a>
+    {% block javascript %}
+        <script src="{{ asset('js/selectionStorage.js') }}"></script>
+    {% endblock %}
 {% endblock %}

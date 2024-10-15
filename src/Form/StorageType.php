@@ -17,7 +17,7 @@ class StorageType extends AbstractType
             ->add('laneNumber')
             ->add('building', EntityType::class, [
                 'class' => Building::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
             ])
         ;
     }

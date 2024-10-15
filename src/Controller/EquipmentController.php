@@ -2,15 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\Storage;
+use App\Entity\Building;
 use App\Entity\Equipment;
+use App\Form\StorageType;
 use App\Form\EquipmentType;
-use App\Repository\EquipmentRepository;
 use Doctrine\DBAL\Query\Limit;
+use App\Repository\EquipmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/equipment')]
 final class EquipmentController extends AbstractController
@@ -28,6 +31,7 @@ final class EquipmentController extends AbstractController
     {
         $equipment = new Equipment();
         $form = $this->createForm(EquipmentType::class, $equipment);
+        $formStorage = $this->createForm(StorageType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -40,6 +44,9 @@ final class EquipmentController extends AbstractController
         return $this->render('equipment/new.html.twig', [
             'equipment' => $equipment,
             'form' => $form,
+            'formStorage' => $formStorage,
+            'buildings' => $entityManager->getRepository(Building::class)->findAll(),
+            'laneLettersGroupedByBuilding' => $entityManager->getRepository(Building::class)->getLaneLettersGroupedByBuilding(),
         ]);
     }
 

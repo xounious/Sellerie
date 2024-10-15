@@ -40,4 +40,21 @@ class BuildingRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function getLaneLettersGroupedByBuilding(): array
+    {
+        $buildings = $this->findAll();
+        $laneLettersGroupedByBuilding = [];
+        foreach ($buildings as $building) {
+            $storages = $building->getStorages();
+            $laneLetters = [];
+            foreach ($storages as $storage) {
+                $laneLetter = $storage->getLaneLetter();
+                if (!in_array($laneLetter, $laneLetters)) {
+                    $laneLetters[] = $laneLetter;
+                }
+            }
+            $laneLettersGroupedByBuilding[$building->getId()] = $laneLetters;
+        }
+        return $laneLettersGroupedByBuilding;
+    }
 }

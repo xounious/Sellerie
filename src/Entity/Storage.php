@@ -20,6 +20,9 @@ class Storage
     private ?Building $building = null;
 
     #[ORM\Column]
+    private ?string $laneLetter = null;
+
+    #[ORM\Column]
     private ?int $laneNumber = null;
 
     /**
@@ -46,6 +49,18 @@ class Storage
     public function setBuilding(?Building $building): static
     {
         $this->building = $building;
+
+        return $this;
+    }
+
+    public function getLaneLetter(): ?string
+    {
+        return $this->laneLetter;
+    }
+
+    public function setLaneLetter(?string $laneLetter): static
+    {
+        $this->laneLetter = $laneLetter;
 
         return $this;
     }

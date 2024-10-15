@@ -81,10 +81,12 @@ class AppFixtures extends Fixture
         //       ajout des storages
         // ###########################################
         $storages = [];
+        $laneLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
         for ($i = 0; $i < 3; $i++) {
             for ($j = 0; $j < 5; $j++) {
                 $storage = new Storage();
                 $storage->setBuilding($buildings[$i]);
+                $storage->setLaneLetter($laneLetters[$faker->numberBetween(0, 6)]);
                 $storage->setLaneNumber($j);
                 $storages[] = $storage;
                 $manager->persist($storage);
