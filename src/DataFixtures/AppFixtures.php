@@ -119,6 +119,7 @@ class AppFixtures extends Fixture
         //       ajout des équipements
         // ###########################################
         $sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+        $equipments = [];
         for ($i = 0; $i < 1000; $i++) {
             $equipment = new Equipment();
             $equipment->setStorage($storages[$faker->numberBetween(0, 14)]);
@@ -128,6 +129,7 @@ class AppFixtures extends Fixture
             $equipment->setDescription($faker->sentence(10));
             $equipment->setSize($sizes[$faker->numberBetween(0, 4)]);
             $equipment->setStockQuantity($faker->numberBetween(0, 10));
+            $equipments[] = $equipment;
             $manager->persist($equipment);
         }
 
@@ -140,8 +142,8 @@ class AppFixtures extends Fixture
             $startDate = $faker->dateTimeBetween('-1 months', '+3 months');
             $loan->setStartDate($startDate);
             $loan->setEndDate($faker->dateTimeBetween($startDate, '+5 months'));
-            $loan->setBorrower($borrowers[$faker->numberBetween(0, 19)]);
-            $loan->setEquipment($equipment[$faker->numberBetween(0, 999)]);
+            $loan->setBorrower($borrowers[$i%19]);
+            $loan->setEquipment($equipments[$faker->numberBetween(0, 999)]);
             $loans[] = $loan;
             $manager->persist($loan);
         }
