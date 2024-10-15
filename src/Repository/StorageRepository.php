@@ -40,4 +40,8 @@ class StorageRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function display(): string
+    {
+        return 'Bâtiment: ' . $this->getBuilding()->getName() . ' - Rayon: ' . $this->getLaneNumber();
+    }
 }

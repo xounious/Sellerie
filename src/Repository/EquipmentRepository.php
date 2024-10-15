@@ -40,4 +40,19 @@ class EquipmentRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function displayTable(): string
+    {
+        $s = '<tr>';
+        $s .= '<td>'.$this->getName().'</td>';
+        $s .= '<td>'.$this->getDescription().'</td>';
+        $s .= '<td>'.$this->getSize().'</td>';
+        $s .= '<td>'.$this->getStockQuantity().'</td>';
+        $s .= '<td>'.$this->getCategory().'</td>';
+        $s .= '<td>'.$this->getStatus().'</td>';
+        $s .= '<td>'.$this->getStorage().'</td>';
+        $s .= '<td><a href="/equipment/'.$this->getId().'">Show</a></td>';
+        $s .= '<td><a href="/equipment/'.$this->getId().'/edit">Edit</a></td>';
+        $s .= '</tr>';
+        return $s;
+    }
 }

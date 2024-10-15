@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Equipment index{% endblock %}
+
+{% block body %}
+    <h1>Equipment index</h1>
+    <div class="relative overflow-x-auto">
+        <table class="table w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th class="px-6 py-3 g">Nom</th>
+                    <th class="px-6 py-3">Taille</th>
+                    <th class="px-6 py-3">Stock</th>
+                    <th class="px-6 py-3">Categorie</th>
+                    <th class="px-6 py-3">État</th>
+                    <th class="px-6 py-3">Stockage</th>
+                    <th class="px-6 py-3">actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for equipment in equipments %}
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ equipment.name }}</td>
+                    <td class="px-6 py-4 mx-2">{{ equipment.size }}</td>
+                    <td class="px-6 py-4 mx-2">{{ equipment.stockQuantity }}</td>
+                    <td class="px-6 py-4 mx-2">{{ equipment.category.name }}</td>
+                    <td class="px-6 py-4 mx-2">{{ equipment.status.name }}</td>
+                    <td class="px-6 py-4 mx-2">{{ equipment.storage.building.name }} - Rayon {{ equipment.storage.laneNumber}}</td>
+                    <td class="px-6 py-4 mx-2">
+                        <a href="{{ path('app_equipment_show', {'id': equipment.id}) }}">show</a>
+                        <a href="{{ path('app_equipment_edit', {'id': equipment.id}) }}">edit</a>
+                    </td>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a href="{{ path('app_equipment_new') }}">Ajouter</a>
+{% endblock %}
