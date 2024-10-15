@@ -3,9 +3,14 @@
 namespace App\DataFixtures;
 
 use Faker\Factory;
+use App\Entity\Status;
+use App\Entity\Storage;
 use App\Entity\Borrower;
+use App\Entity\Building;
 use App\Entity\Employee;
+use App\Entity\Equipment;
 use App\Entity\BorrowerType;
+use App\Entity\EquipmentCategory;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 
@@ -16,7 +21,9 @@ class AppFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
-        // ajout des 2 types d'emprunteurs (client et employé)
+        // ###########################################
+        //       ajout des 2 types d'emprunteurs
+        // ###########################################
         $typeCustomer = new BorrowerType();
         $typeCustomer->setName('customer');
         $manager->persist($typeCustomer);
@@ -33,7 +40,9 @@ class AppFixtures extends Fixture
             $borrowers[] = $borrower;
         }
 
-        //ajout de 20 employés dont 1 administrateur
+        // ###########################################
+        //       ajout des 20 employés dont 1 admin
+        // ###########################################
         for ($i = 0; $i < 19; $i++) {
             $employee = new Employee();
             if ($i === 0) {
@@ -53,6 +62,79 @@ class AppFixtures extends Fixture
             $employee->setBorrower($borrowers[$i]);
             $manager->persist($employee);
         }
+
+        // ###########################################
+        //       ajout des buildings
+        // ###########################################
+        $buildings = [];
+        $names = ['Atelier', 'Sellerie', 'Magasin', 'Bureau', 'Cantine'];
+        for ($i = 0; $i < 5; $i++) {
+            $building = new Building();
+            $building->setName($names[$i]);
+            $buildings[] = $building;
+            $manager->persist($building);
+        }
+
+
+        // ###########################################
+        //       ajout des storages
+        // ###########################################
+        $storages = [];
+        for ($i = 0; $i < 3; $i++) {
+            for ($j = 0; $j < 5; $j++) {
+                $storage = new Storage();
+                $storage->setBuilding($buildings[$i]);
+                $storage->setLaneNumber($j);
+                $storages[] = $storage;
+                $manager->persist($storage);
+            }
+        }
+
+        // ###########################################
+        //       ajout des catégories d'équipements
+        // ###########################################
+        $categories = [];
+        $names = ['Outils', 'Consommables', 'Vêtements', 'Selles', 'Brides', 'Mors', 'Etriers', 'Bottes', 'Casques'];
+        for ($i = 0; $i < 9; $i++) {
+            $category = new EquipmentCategory();
+            $category->setName($names[$i]);
+            $categories[] = $category;
+            $manager->persist($category);
+        }
+
+        // ###########################################
+        //       ajout des status d'équipements
+        // ###########################################
+        $status = [];
+        $names = ['Neuf', 'Bon état', 'Usé', 'En réparation', 'A réparer', 'Hors service'];
+        for ($i = 0; $i < 6; $i++) {
+            $stat = new Status();
+            $stat->setName($names[$i]);
+            $status[] = $stat;
+            $manager->persist($stat);
+        }
+
+        // ###########################################
+        //       ajout des équipements
+        // ###########################################
+        $sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+        for ($i = 0; $i < 1000; $i++) {
+            $equipment = new Equipment();
+            $equipment->setStorage($storages[$faker->numberBetween(0, 14)]);
+            $equipment->setStatus($status[$faker->numberBetween(0, 5)]);
+            $equipment->setCategory($categories[$faker->numberBetween(0, 8)]);
+            $equipment->setName($faker->word);
+            $equipment->setDescription($faker->sentence(10));
+            $equipment->setSize($sizes[$faker->numberBetween(0, 4)]);
+            $equipment->setStockQuantity($faker->numberBetween(0, 10));
+            $manager->persist($equipment);
+        }
+
+        // ###########################################
+        //       
+        // ###########################################
+
+
 
         $manager->flush();
     }
