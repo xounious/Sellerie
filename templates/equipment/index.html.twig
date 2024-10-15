@@ -1,37 +1,40 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Equipment index{% endblock %}
+{% block stylesheets %}
+    <link rel="https://cdn.datatables.net/2.1.8/css/dataTables.min.css">
+{% endblock %}
 
 {% block body %}
     <h1>Equipment index</h1>
-    <div class="relative overflow-x-auto">
-        <table class="table w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <div class='w-full p-16'>
+        <table class="table display">
+            <thead>
                 <tr>
-                    <th class="px-6 py-3 g">Nom</th>
-                    <th class="px-6 py-3">Taille</th>
-                    <th class="px-6 py-3">Stock</th>
-                    <th class="px-6 py-3">Categorie</th>
-                    <th class="px-6 py-3">État</th>
-                    <th class="px-6 py-3">Stockage</th>
-                    <th class="px-6 py-3">actions</th>
+                    <th>Nom</th>
+                    <th>Taille</th>
+                    <th>Stock</th>
+                    <th>Categorie</th>
+                    <th>État</th>
+                    <th>Stockage</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
             {% for equipment in equipments %}
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ equipment.name }}</td>
-                    <td class="px-6 py-4 mx-2">{{ equipment.size }}</td>
-                    <td class="px-6 py-4 mx-2">{{ equipment.stockQuantity }}</td>
-                    <td class="px-6 py-4 mx-2">{{ equipment.category.name }}</td>
-                    <td class="px-6 py-4 mx-2">{{ equipment.status.name }}</td>
+                <tr>
+                    <td>{{ equipment.name }}</td>
+                    <td>{{ equipment.size }}</td>
+                    <td>{{ equipment.stockQuantity }}</td>
+                    <td>{{ equipment.category.name }}</td>
+                    <td>{{ equipment.status.name }}</td>
                     {% if equipment.storage %}
-                        <td class="px-6 py-4 mx-2">{{ equipment.storage.building.name }} - Rayon {{ equipment.storage.laneNumber}}</td>
+                        <td>{{ equipment.storage.building.name }} - Rayon {{ equipment.storage.laneNumber}}</td>
                     {% else %}
-                        <td class="px-6 py-4 mx-2">Pas de stockage</td>
+                        <td>Pas de stockage</td>
                     {% endif %}
-                    <td class="px-6 py-4 mx-2">
-                        <a href="{{ path('app_equipment_show', {'id': equipment.id}) }}">show</a>
+                    <td>
+                        <a href="{{ path('app_equipment_reservations', {'id': equipment.id}) }}">Regarder les réservations</a>
                         <a href="{{ path('app_equipment_edit', {'id': equipment.id}) }}">edit</a>
                     </td>
             {% endfor %}
@@ -39,4 +42,16 @@
         </table>
     </div>
     <a href="{{ path('app_equipment_new') }}">Ajouter</a>
+    {% block javascripts %}
+        <script src='https://code.jquery.com/jquery-3.7.1.js'></script>
+        <script src='https://cdn.tailwindcss.com/'></script>
+        <script src='https://cdn.datatables.net/2.1.8/js/dataTables.min.js'></script>
+        <script src='https://cdn.datatables.net/2.1.8/js/dataTables.tailwindcss.js'></script>
+        <script src='https://cdn.tailwindcss.com/'></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                let table = new DataTable('.table');
+            });
+        </script>
+    {% endblock %}
 {% endblock %}

@@ -86,4 +86,12 @@ final class EquipmentController extends AbstractController
 
         return $this->redirectToRoute('app_equipment_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/{id}', name: 'app_equipment_reservations', methods: ['POST'])]
+    public function reservations(Request $request, Equipment $equipment, EntityManagerInterface $entityManager): Response
+    {
+        return $this->render('equipment/reservations.html.twig', [
+            'equipment' => $equipment,
+        ]);
+    }
 }

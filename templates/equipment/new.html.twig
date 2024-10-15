@@ -12,7 +12,7 @@
         {{ form_row(form.category) }}
         {{ form_row(form.status) }}
         <button type="button" onclick="document.getElementById('storage').style.display = 'block';">Sélectionner le stockage</button>
-        <div id="storage" style="display: block;">
+        <div id="storage" style="display: none;">
             {{ form_start(formStorage) }}
                 {{ form_row(formStorage.building) }}
                 {{ form_row(formStorage.laneNumber) }}
