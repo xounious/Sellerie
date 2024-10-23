@@ -139,7 +139,7 @@ class AppFixtures extends Fixture
         //       ajout des Prêts
         // ###########################################
         $loans = [];
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 1000; $i++) {
             $loan = new Loan();
             $startDate = $faker->dateTimeBetween('-1 months', '+3 months');
             $loan->setStartDate($startDate);

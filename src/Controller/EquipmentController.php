@@ -55,6 +55,7 @@ final class EquipmentController extends AbstractController
     {
         return $this->render('equipment/show.html.twig', [
             'equipment' => $equipment,
+            'loans' => $equipment->getLoans(),
         ]);
     }
 
