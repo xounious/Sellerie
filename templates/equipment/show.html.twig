@@ -4,14 +4,16 @@
 
 {% block body %}
     <h1 class="text-5xl text-center py-4">Réservations de {{ equipment.name }}</h1>
-    <div id='calendar' class="sm:m-8 bg-blue-400 rounded-md p-6"></div>
-
+    
     {% block javascripts %}
-        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+        <script src='{{ asset('js/fullcalendar/index.global.min.js')}}'></script>
         <script>
 
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
+            var calendarEl = document.createElement('div');
+            calendarEl.id = 'calendar';
+            calendarEl.classList.add('sm:m-8', 'bg-blue-400', 'rounded-md', 'p-6');
+            document.body.appendChild(calendarEl);
+
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'multiMonthYear',
                 eventSources: [
@@ -19,9 +21,10 @@
                         events: [
                             {% for loan in loans %}
                                 {
-                                    title  : '{{ loan.borrower.id }}',
+                                    title  : '{{ loan.borrower.BorrowerName }}',
                                     start  : '{{ loan.startDate|date('Y-m-d') }}',
                                     end    : '{{ loan.endDate|date('Y-m-d') }}',
+                                    url   : "{{ path('borrower_show', {'id': loan.borrower.id, 'selected_loan_id': loan.id}) }}",
                                 },
                             {% endfor %}
                         ]
@@ -29,7 +32,6 @@
                 ]
             });
             calendar.render();
-        });
 
         </script>
     {% endblock %}

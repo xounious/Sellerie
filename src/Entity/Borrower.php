@@ -101,4 +101,8 @@ class Borrower
 
         return $this;
     }
+    public function getBorrowerName(): string
+    {
+        return $this->getEmployee()->getFirstname() . ' ' . $this->getEmployee()->getLastname();
+    }
 }
