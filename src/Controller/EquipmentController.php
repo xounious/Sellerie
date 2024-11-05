@@ -18,10 +18,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/equipment')]
 final class EquipmentController extends AbstractController
 {
-    #[Route(name: 'app_equipment_index', methods: ['GET'])]
+    #[Route(name: 'equipments', methods: ['GET'])]
     public function index(EquipmentRepository $equipmentRepository): Response
     {
         return $this->render('equipment/index.html.twig', [
+            'employee' => $this->getUser(),
             'equipments' => $equipmentRepository->findAll(),
         ]);
     }
@@ -38,7 +39,7 @@ final class EquipmentController extends AbstractController
             $entityManager->persist($equipment);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_equipment_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('equipments', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('equipment/new.html.twig', [

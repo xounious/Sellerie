@@ -10,6 +10,15 @@
         {% block importmap %}{{ importmap('app') }}{% endblock %}
     </head>
     <body>
+        <header>
+        {% if employee is defined %}
+            {% if 'ROLE_ADMIN' in employee.roles %}
+                {% include 'www/nav_admin.html.twig' %}
+            {% elseif 'ROLE_EMPLOYEE' in employee.roles %}
+                {% include 'www/nav_employee.html.twig' %}
+            {% endif %}
+        {% endif %}
+        </header>
         {% block body %}{% endblock %}
     </body>
     {% block javascripts %}

@@ -4,8 +4,9 @@
 
 {% block body %}
     <h1 class="text-5xl text-center py-4">Réservations de {{ equipment.name }}</h1>
-    
-    {% block javascripts %}
+{% endblock %}
+
+{% block javascripts %}
         <script src='{{ asset('js/fullcalendar/index.global.min.js')}}'></script>
         <script>
 
@@ -35,5 +36,4 @@
 
         </script>
     {% endblock %}
-{% endblock %}
 

@@ -20,7 +20,7 @@ class SecurityController extends AbstractController
 
         //redirect vers home si l'utilisateur est connecté
         if ($this->getUser()) {
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('home');
         }
 
         return $this->render('security/login.html.twig', [
