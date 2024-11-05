@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Equipment index{% endblock %}
+{% block stylesheets %}
+    <link rel="https://cdn.datatables.net/2.1.8/css/dataTables.min.css">
+{% endblock %}
+
+{% block body %}
+    <h1>Gestion des Employés</h1>
+    <p class='text-green-500'>{{ message }}</p>
+    <script>
+        function deleteEmployeeConfirmation(id) {
+            let confirmation = confirm('Voulez-vous vraiment supprimer cet employé ?');
+            if (confirmation) {
+                window.location.href = '/admin/deleteEmployee/' + id;
+            }
+        }
+    </script>
+    <div class='w-full p-16'>
+        <table class="table" style='visibility: hidden;'>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for employee in employees %}
+            {% if 'ROLE_ADMIN' not in employee.roles %}
+                <tr>
+                    <td>{{ employee.firstname }} {{ employee.lastname }}</td>
+                    <td>
+                        <p onclick='deleteEmployeeConfirmation({{employee.id}})'>Supprimer cet Employé</p>
+                        <p><a href='{{ path('app_edit_employee', {id: employee.id}) }}'>Modifier cet Employé</a></p>
+                    </td>
+                </tr>
+            {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src='https://code.jquery.com/jquery-3.7.1.js'></script>
+    <script src='https://cdn.datatables.net/2.1.8/js/dataTables.min.js'></script>
+    <script src='https://cdn.datatables.net/2.1.8/js/dataTables.tailwindcss.js'></script>
+    <script src='https://cdn.tailwindcss.com/'></script>
+    <script>
+        setTimeout(() => {
+            var table = new DataTable('.table');
+            document.querySelector('.table').style.visibility = 'visible';
+        }, 500);
+    </script>
+{% endblock %}

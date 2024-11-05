@@ -43,6 +43,7 @@ final class EquipmentController extends AbstractController
         }
 
         return $this->render('equipment/new.html.twig', [
+            'employee' => $this->getUser(),
             'equipment' => $equipment,
             'form' => $form,
             'formStorage' => $formStorage,
@@ -55,6 +56,7 @@ final class EquipmentController extends AbstractController
     public function show(Equipment $equipment): Response
     {
         return $this->render('equipment/show.html.twig', [
+            'employee' => $this->getUser(),
             'equipment' => $equipment,
             'loans' => $equipment->getLoans(),
         ]);
