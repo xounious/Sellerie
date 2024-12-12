@@ -4,6 +4,24 @@
 
 {% block body %}
     <h1 class="text-5xl text-center py-4">Réservations de {{ equipment.name }}</h1>
+    <div class="flex flex-row justify-between">
+        <a href="{{ path('app_loan_new', {'equipment_id': equipment.id}) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Créer une nouvelle réservation</a>
+        <form action="{{ path('equipment_modify_status', {'id': equipment.id}) }}" method="post">
+            <select id="status" name="status" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-4">
+                {% for statut in allStatus %}
+                    {% if statut == status %}
+                        <option selected value="{{ statut.id }}">{{ statut.name }}</option>
+                    {% else %}
+                        <option value="{{ statut.id }}">{{ statut.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-4">Modifier le statut de l'équipement</button>
+            {% if succes  %}
+                <p>{{ succes }}</p>
+            {% endif %}
+        </form>
+    </div>
 {% endblock %}
 
 {% block javascripts %}
@@ -19,7 +37,7 @@
                 initialView: 'multiMonthYear',
                 eventSources: [
                     {
-                        events: [
+                        events: [ 
                             {% for loan in loans %}
                                 {
                                     title  : '{{ loan.borrower.BorrowerName }}',

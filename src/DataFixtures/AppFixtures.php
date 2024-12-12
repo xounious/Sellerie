@@ -8,6 +8,7 @@ use App\Entity\Status;
 use App\Entity\Storage;
 use App\Entity\Borrower;
 use App\Entity\Building;
+use App\Entity\Customer;
 use App\Entity\Employee;
 use App\Entity\Equipment;
 use App\Entity\BorrowerType;
@@ -65,6 +66,22 @@ class AppFixtures extends Fixture
         }
 
         // ###########################################
+        //       ajout de 100 clients
+        // ###########################################
+        for ($i = 0; $i < 100; $i++) {
+            $customer = new Customer();
+            $customer->setFirstname($faker->firstName);
+            $customer->setLastname($faker->lastName);
+            $customer->setPhone($faker->numberBetween(1000000000, 9999999999));
+            $manager->persist($customer);
+            $borrower = new Borrower();
+            $borrower->setType($typeCustomer);
+            $borrower->setCustomer($customer);
+            $customer->setBorrower($borrower);
+            $manager->persist($borrower);
+        }
+
+        // ###########################################
         //       ajout des buildings
         // ###########################################
         $buildings = [];
@@ -82,7 +99,7 @@ class AppFixtures extends Fixture
         // ###########################################
         $storages = [];
         $laneLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             for ($j = 0; $j < 5; $j++) {
                 $storage = new Storage();
                 $storage->setBuilding($buildings[$i]);

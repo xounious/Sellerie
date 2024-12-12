@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Status;
 use App\Entity\Storage;
 use App\Entity\Building;
 use App\Entity\Equipment;
@@ -53,12 +54,15 @@ final class EquipmentController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_equipment_show', methods: ['GET'])]
-    public function show(Equipment $equipment): Response
+    public function show(Request $request, Equipment $equipment, EntityManagerInterface $entityManager): Response
     {
         return $this->render('equipment/show.html.twig', [
             'employee' => $this->getUser(),
             'equipment' => $equipment,
             'loans' => $equipment->getLoans(),
+            'status' => $equipment->getStatus(),
+            'allStatus' => $entityManager->getRepository(Status::class)->findAll(),
+            'succes' => $request->get('succes'),
         ]);
     }
 
@@ -91,11 +95,15 @@ final class EquipmentController extends AbstractController
         return $this->redirectToRoute('app_equipment_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}', name: 'app_equipment_reservations', methods: ['POST'])]
-    public function reservations(Request $request, Equipment $equipment, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/modifyStatus', name: 'equipment_modify_status', methods: ['POST'])]
+    public function modifyStatus(Request $request, Equipment $equipment, EntityManagerInterface $entityManager): Response
     {
-        return $this->render('equipment/reservations.html.twig', [
-            'equipment' => $equipment,
-        ]);
+        if ($request->get('status')) {
+            $status = $entityManager->getRepository(Status::class)->find($request->get('status'));
+            $equipment->setStatus($status);
+            $entityManager->persist($equipment);
+            $entityManager->flush();
+            return $this->redirectToRoute('app_equipment_show', ['id' => $equipment->getId(), 'succes' => 'Le statut à été modifié en "'.$status->getName().'".'], Response::HTTP_SEE_OTHER);
+        }
     }
 }

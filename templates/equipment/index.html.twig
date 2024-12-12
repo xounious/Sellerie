@@ -37,8 +37,7 @@
                         <td>Pas de stockage</td>
                     {% endif %}
                     <td>
-                        <a href="{{ path('app_equipment_reservations', {'id': equipment.id}) }}">Regarder les réservations</a>
-                        <a href="{{ path('app_equipment_edit', {'id': equipment.id}) }}">edit</a>
+                        <a href="{{ path('app_equipment_show', {'id': equipment.id}) }}">Acceder à l'interface de cet equipement</a>
                     </td>
             {% endfor %}
             </tbody>

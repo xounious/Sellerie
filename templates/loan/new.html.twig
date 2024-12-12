@@ -3,9 +3,83 @@
 {% block title %}New Loan{% endblock %}
 
 {% block body %}
-    <h1>Create new Loan</h1>
+    <h1>Emprunter {{equipment.name}}</h1>
+    <p>Description</p>
+    <p>{{equipment.description}}</p>
+    <form method="get" action="{{path('app_loan_new')}}">
+        <div id="date">
+            <h2>Date d'emprunt</h2>
+            <label for="startDate">Date de début</label>
+            <input type="date" name="startDate" id="startDate">
+            <label for="endDate">Date de fin</label>
+            <input type="date" name="endDate" id="endDate">
+        </div>
+        <h2>L'emprunteur</h2>
+        <input type="hidden" name="equipment_id" value="{{ equipment.id }}">
+        <label for="typeBorrower">Type d'emprunteur</label>
+        <select name="typeBorrower" id="typeBorrower">
+            <option value="customer" selected>Client</option>
+            <option value="employee">Employé</option>
+        </select>
 
-    {{ include('loan/_form.html.twig') }}
+        <div id="customer">
+            <h2>Selectionner un client existant</h2>
+            <label for="customerSelect">Selectionnez</label>
+            <select name="customerSelect" id="customerSelect">
+                <option value="default" default>Pas de client selectionné</option>
+                {% for customer in customers %}
+                    <option value="{{ customer.id }}" firstname="{{ customer.firstname }}" lastname="{{ customer.lastname }}" phone="{{ customer.phone }}">{{ customer.lastname }} {{ customer.firstname }}</option>
+                {% endfor %}
+            </select>
+            <h2>Ou créez un client</h2>
+            <label for="firstname">Prénom</label>
+            <input type="text" name="firstname" id="firstname">
+            <label for="lastname">Nom</label>
+            <input type="text" name="lastname" id="lastname">
+            <label for="phone">Phone</label>
+            <input type="text" name="phone" id="phone">
+        </div>
+
+        <div id="employee" class="hidden">
+            <label for="employeeSelect">Selectionnez</label>
+            <select name="employeeSelect" id="employeeSelect">
+                <option value="default" default>Pas d'employé selectionné</option>
+                <option value="{{ employee.id }}">Vous même</option>
+                {% for employee_ in employees %}
+                    {% if employee != employee_ %}
+                        <option value="{{ employee_.id }}">{{ employee_.lastname }} {{ employee_.firstname }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <button id="submit" type="submit">Aucun emprunteur selectionné</button>
+        <script>
+            document.querySelector('#typeBorrower').addEventListener('change', function() {
+                if (this.value === 'customer') {
+                    document.querySelector('#customer').classList.remove('hidden');
+                    document.querySelector('#employee').classList.add('hidden');
+                    document.querySelector('#submit').innerHTML = 'Emprunter pour ce client';
+                } else {
+                    document.querySelector('#customer').classList.add('hidden');
+                    document.querySelector('#employee').classList.remove('hidden');
+                    document.querySelector('#submit').innerHTML = 'Emprunter pour cet employé';
+                }
+            });
+            document.querySelector('#customerSelect').addEventListener('change', function() {
+                if (this.value !== 'default') {
+                    let select = document.querySelector('#customerSelect');
+                    document.querySelector('#customer #firstname').value = select.options[select.selectedIndex].getAttribute('firstname');
+                    document.querySelector('#customer #firstname').setAttribute('readonly', 'readonly');
+                    document.querySelector('#customer #lastname').value = select.options[select.selectedIndex].getAttribute('lastname');
+                    document.querySelector('#customer #lastname').setAttribute('readonly', 'readonly');
+                    document.querySelector('#customer #phone').value = select.options[select.selectedIndex].getAttribute('phone');
+                    document.querySelector('#customer #phone').setAttribute('readonly', 'readonly');
+                    document.querySelector('#submit').innerHTML = 'Emprunter pour le client selectionné';
+                } else {
+                    document.querySelector('#submit').innerHTML = 'Emprunter pour un nouveau client et créer ce client';
+                }
+            });
+        </script>
 
     <a href="{{ path('app_loan_index') }}">back to list</a>
 {% endblock %}

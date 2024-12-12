@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques inventaire{% endblock %}
+
+{% block body %}
+    <h1>Statistiques sur l'inventaire</h1>
+    <div>
+        <h2>Statistiques des status</h2>
+        <table>
+            <tr>
+                <th>Statut de l'équipement</th>
+                <th>Quantité</th>
+            </tr>
+            <tbody>
+                {% for status, count in statistiquesStatus %}
+                    <tr>
+                        <td>{{ status }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h2>Statistiques des Prêts</h2>
+        <table>
+            <tr>
+                <th>Type de prêt</th>
+                <th>Quantité d'équipements</th>
+            </tr>
+            <tbody>
+                {% for type, count in statistiquesLoaned %}
+                    <tr>
+                        <td>{{ type }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h2>Statistiques du stockage</h2>
+        <table>
+            <tr>
+                <th>Bâtiment</th>
+                <th>Quantité d'équipements stockée</th>
+            </tr>
+            <tbody>
+                {% for building, count in statistiquesStorage %}
+                    <tr>
+                        <td>{{ building }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

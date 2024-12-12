@@ -1,0 +1,7 @@
+liste des choses à faire : 
+- suivre les mouvements d'equipements
+- dans l'ajout d'équipement, il faut faire le choix du stockage
+- gestions des retours (une interface pour remmetre l'équipement)
+- historique des mouvements de chaque équipement
+- ??? planing des maintenances périodiques
+- suivi des réparations effectuées et leurs couts

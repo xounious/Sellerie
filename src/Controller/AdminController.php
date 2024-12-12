@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Loan;
+use App\Entity\Status;
 use App\Entity\Employee;
+use App\Entity\Equipment;
 use App\Form\EmployeeType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,14 +53,16 @@ class AdminController extends AbstractController
     #[Route('/editEmployee/{id}', name: 'app_edit_employee')]
     public function editEmployee(Request $request, Employee $employee, EntityManagerInterface $entityManager): Response
     {
-        $employee = new Employee();
-
         $form = $this->createForm(EmployeeType::class, $employee);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $employee = $form->getData();
-            $employee->setRoles(['ROLE_EMPLOYEE']);
+            dd($employee);
+            $data = $form->getData();
+            $employee->setFirstname($data->getFirstname());
+            $employee->setLastname($data->getLastname());
+            $employee->setEmail($data->getEmail());
+            dd($employee);
             $entityManager->persist($employee);
             $entityManager->flush();
 
@@ -68,7 +73,47 @@ class AdminController extends AbstractController
 
         return $this->render('admin/editEmployee.html.twig', [
             'form' => $form->createView(),
+            'employee' => $employee,
         ]);
     }
 
+    #[Route('/statistiquesInventaire', name: 'app_statistiques_inventaire')]
+    public function statistiquesInventaire(EntityManagerInterface $entityManager): Response
+    {
+        $status = $entityManager->getRepository(Status::class)->findAll();
+        $statistiquesStatus = [];
+        foreach ($status as $s) {
+            $statistiquesStatus[$s->getName()] = count($s->getEquipment());
+        }
+
+        $equipments = $entityManager->getRepository(Equipment::class)->findAll();
+        $statistiquesStorage = [];
+        $statistiquesLoaned = [
+            'Prêts en cours' => 0,
+            'Prêts à venir' => 0,
+            'Total des prêts' => 0,
+        ];
+        foreach ($equipments as $e) {
+            if (isset($statistiquesStorage[$e->getStorage()->getBuilding()->getName()])) {
+                $statistiquesStorage[$e->getStorage()->getBuilding()->getName()]++;
+            } else {
+                $statistiquesStorage[$e->getStorage()->getBuilding()->getName()] = 1;
+            }
+            $loans = $e->getLoans();
+            foreach ($loans as $l) {
+                if ($l->getEndDate() > new \DateTime() && $l->getStartDate() < new \DateTime()) {
+                    $statistiquesLoaned['Prêts en cours']++;
+                } else if ($l->getEndDate() > new \DateTime()) {
+                    $statistiquesLoaned['Prêts à venir']++;
+                }
+                $statistiquesLoaned['Total des prêts']++;
+            }
+        }
+        return $this->render('admin/statistiquesInventaire.html.twig', [
+            'statistiquesStatus' => $statistiquesStatus,
+            'statistiquesStorage' => $statistiquesStorage,
+            'statistiquesLoaned' => $statistiquesLoaned,
+            'employee' => $this->getUser(),
+        ]);
+    }
 }

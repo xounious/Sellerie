@@ -28,6 +28,9 @@ class Borrower
     #[ORM\OneToMany(targetEntity: Loan::class, mappedBy: 'borrower', orphanRemoval: true)]
     private Collection $loans;
 
+    #[ORM\OneToOne(mappedBy: 'borrower', cascade: ['persist', 'remove'])]
+    private ?Customer $customer = null;
+
     public function __construct()
     {
         $this->loans = new ArrayCollection();
@@ -103,6 +106,32 @@ class Borrower
     }
     public function getBorrowerName(): string
     {
-        return $this->getEmployee()->getFirstname() . ' ' . $this->getEmployee()->getLastname();
+        if ($this->getType()->getName() === 'customer') {
+            return $this->getCustomer()->getFirstname() . ' ' . $this->getCustomer()->getLastname();
+        } else {
+            return $this->getEmployee()->getFirstname() . ' ' . $this->getEmployee()->getLastname();
+        }
+    }
+
+    public function getCustomer(): ?Customer
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?Customer $customer): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($customer === null && $this->customer !== null) {
+            $this->customer->setBorrower(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($customer !== null && $customer->getBorrower() !== $this) {
+            $customer->setBorrower($this);
+        }
+
+        $this->customer = $customer;
+
+        return $this;
     }
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form method="post">
+        <label for="typeBorrower">Type d'emprunteur</label>
+        <select name="typeBorrower" id="typeBorrower">
+            <option value="customer">Client</option>
+            <option value="employee">Employé</option>
+        </select>
+        <div id="customer" class="hidden">
+            <h2>Selectionner un client existant</h2>
+            <label for="customer">Selectionnez</label>
+            <select name="customer" id="customer">
+                <option value="default" default>Pas de client selectionné</option>
+            </select>
+            <h2>Ou créez un client</h2>
+            <label for="firstname">Prénom</label>
+            <input type="text" name="firstname" id="firstname">
+            <label for="lastname">Nom</label>
+            <input type="text" name="lastname" id="lastname">
+            <label for="email">Email</label>
+            <input type="phone" name="phone" id="phone">
+        </div>
+        <div id="employee" class="hidden">
+            <select name="employee" id="employee"></select>
+        </div>
+        <button type="submit">Emprunter</button>
+        <script>
+            document.querySelector('#typeBorrower').addEventListener('change', function() {
+                if (this.value === 'customer') {
+                    document.querySelector('#customer').classList.remove('hidden');
+                    document.querySelector('#employee').classList.add('hidden');
+                    document.querySelector('button').innerHTML = 'Emprunter pour ce client';
+                } else {
+                    document.querySelector('#customer').classList.add('hidden');
+                    document.querySelector('#employee').classList.remove('hidden');
+                    document.querySelector('button').innerHTML = 'Emprunter pour cet employé';
+                }
+            });
+            document.querySelector('#customer').addEventListener('change', function() {
+                if (this.value !== 'default') {
+                    document.querySelector('button').innerHTML = 'Emprunter pour un nouveau client et créer ce client';
+                } else {
+                    document.querySelector('button').innerHTML = 'Emprunter pour le client selectionné';
+                }
+            });
+        </script>
+</body>
+</html>
