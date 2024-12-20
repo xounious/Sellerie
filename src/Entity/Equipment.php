@@ -42,9 +42,16 @@ class Equipment
     #[ORM\OneToMany(targetEntity: Loan::class, mappedBy: 'equipment', orphanRemoval: true)]
     private Collection $loans;
 
+    /**
+     * @var Collection<int, EquipmentLogs>
+     */
+    #[ORM\OneToMany(targetEntity: EquipmentLogs::class, mappedBy: 'equipment', orphanRemoval: true)]
+    private Collection $equipmentLogs;
+
     public function __construct()
     {
         $this->loans = new ArrayCollection();
+        $this->equipmentLogs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -160,6 +167,36 @@ class Equipment
             // set the owning side to null (unless already changed)
             if ($loan->getEquipment() === $this) {
                 $loan->setEquipment(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EquipmentLogs>
+     */
+    public function getEquipmentLogs(): Collection
+    {
+        return $this->equipmentLogs;
+    }
+
+    public function addEquipmentLog(EquipmentLogs $equipmentLog): static
+    {
+        if (!$this->equipmentLogs->contains($equipmentLog)) {
+            $this->equipmentLogs->add($equipmentLog);
+            $equipmentLog->setEquipment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEquipmentLog(EquipmentLogs $equipmentLog): static
+    {
+        if ($this->equipmentLogs->removeElement($equipmentLog)) {
+            // set the owning side to null (unless already changed)
+            if ($equipmentLog->getEquipment() === $this) {
+                $equipmentLog->setEquipment(null);
             }
         }
 

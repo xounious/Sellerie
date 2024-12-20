@@ -3,9 +3,21 @@
 {% block title %}Modifier employee{% endblock %}
 
 {% block body %}
-    {{ form_start(form) }}
-    {{ form_row(form.firstname, {'value': employee.firstname}) }}
-    {{ form_row(form.lastname, {'value': employee.lastname}) }}
-    {{ form_row(form.email, {'value': employee.email}) }}
-    {{ form_row(form.edit) }}
+    <h1 class="text-3xl font-bold mb-4 mt-8 w-fit mx-auto">Modifier un employé</h1>
+    <div class='w-2/3 p-16 mx-auto bg-white shadow-md rounded-lg'>
+        {{ form_start(form) }}
+            <div class="mb-4">
+                {{ form_row(form.firstname, {'value': employee.firstname, 'attr': {'class': 'block w-full p-2 border border-gray-300 rounded'}}) }}
+            </div>
+            <div class="mb-4">
+                {{ form_row(form.lastname, {'value': employee.lastname, 'attr': {'class': 'block w-full p-2 border border-gray-300 rounded'}}) }}
+            </div>
+            <div class="mb-4">
+                {{ form_row(form.email, {'value': employee.email, 'attr': {'class': 'block w-full p-2 border border-gray-300 rounded'}}) }}
+            </div>
+            <div class="mb-4">
+                {{ form_row(form.edit, {'attr': {'class': 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700'}}) }}
+            </div>
+        {{ form_end(form) }}
+    </div>
 {% endblock %}

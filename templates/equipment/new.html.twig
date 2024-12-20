@@ -1,50 +1,67 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Equipment{% endblock %}
+{% block title %}Nouvel Équipement{% endblock %}
 
 {% block body %}
-    <h1>Create new Equipment</h1>
+    <div class="container mx-auto p-6 w-1/2">
+        <h1 class="text-2xl font-bold mb-6">Créer un nouvel Équipement</h1>
+        
+        {% if error is defined %}
+            <div class="alert alert-danger text-red-500 mb-4">{{ error }}</div>
+        {% endif %}
 
-    {{ form_start(form) }}
-        {{ form_row(form.name) }}
-        {{ form_row(form.description) }}
-        {{ form_row(form.stockQuantity) }}
-        {{ form_row(form.category) }}
-        {{ form_row(form.status) }}
-        <button type="button" onclick="document.getElementById('storage').style.display = 'block';">Sélectionner le stockage</button>
-        <div id="storage" style="display: none;">
-            {{ form_start(formStorage) }}
-                {{ form_row(formStorage.building) }}
-                {{ form_row(formStorage.laneNumber) }}
-            {{ form_end(formStorage) }}
-            <div id="containerStorage" class="relative">
-                <div id="equipment" class="absolute bottom-1 left-1/2 transform -translate-x-1/2 rounded bg-orange-300  hover:cursor-move p-5 z-10 shadow-md ">
-                    <p>Nom</p>
-                    <p>Taille</p>
-                    <p>Quantité</p>
-                </div>
-                <div id="buildings" class="flex w-full justify-around bg-slate-300 rounded pb-32 pt-3 h-64 space-x-10 px-10">
-                {% for building in buildings %}
-                    <div id="{{ building.name }}" class="building flex-1 bg-orange-100 z-10 p-2 rounded">
-                        <button class="changeBuilding" class="rounded-sm bg-orange-600 text-white shadow-sm" style="display: none;">Changer de bâtiment</button>
-                        <p class="text-sm text-orange-950 text-center">{{ building.name }}</p>
-                        <div class="emplacements" class="w-80 border-2 rounded" style="display: none;">
-                        {% for laneLetter in laneLettersGroupedByBuilding[building.getId()] %}
-                            <div class="lane" id="{{ laneLetter }}">
-                                <p class="text-sm text-center text-orange-950 w-fit">{{ laneLetter }}</p>
-                            </div>
-                        {% endfor %}
-                        </div>
-                    </div>
-                {% endfor %}
-                </div>
+        <form action="{{ path('nouvel_equipement') }}" method="post" class="space-y-4">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">Nom :</label>
+                <input type="text" id="name" name="name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             </div>
-        </div>
-        {{ form_row(form.save)}}
-    {{ form_end(form) }}
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700">Description :</label>
+                <textarea id="description" name="description" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+            </div>
+            <div>
+                <label for="size" class="block text-sm font-medium text-gray-700">Taille :</label>
+                <input type="text" id="size" name="size" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="stock" class="block text-sm font-medium text-gray-700">Quantité en Stock :</label>
+                <input type="number" id="stock" name="stock" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700">Statut :</label>
+                <select id="status" name="status" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    {% for status in statuses %}
+                        <option value="{{ status.id }}">{{ status.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="category" class="block text-sm font-medium text-gray-700">Catégorie :</label>
+                <select id="category" name="category" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="building" class="block text-sm font-medium text-gray-700">Bâtiment :</label>
+                <select id="building" name="building" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    {% for building in buildings %}
+                        <option value="{{ building.id }}">{{ building.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="laneLetter" class="block text-sm font-medium text-gray-700">Lettre de l'Allée :</label>
+                <input type="text" id="laneLetter" name="laneLetter" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="laneNumber" class="block text-sm font-medium text-gray-700">Numéro de l'Allée :</label>
+                <input type="number" id="laneNumber" name="laneNumber" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <button type="submit" class="btn bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Créer l'équipement</button>
+        </form>
 
-    <a href="{{ path('equipments') }}">back to list</a>
-    {% block javascript %}
-        <script src="{{ asset('js/selectionStorage.js') }}"></script>
-    {% endblock %}
+        <a href="{{ path('equipments') }}" class="mt-4 inline-block text-indigo-600 hover:text-indigo-900">abandonner</a>
+    </div>
 {% endblock %}

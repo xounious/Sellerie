@@ -4,8 +4,9 @@
 
 {% block body %}
     <h1 class="text-5xl text-center py-4">Réservations de {{ equipment.name }}</h1>
-    <div class="flex flex-row justify-between">
-        <a href="{{ path('app_loan_new', {'equipment_id': equipment.id}) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Créer une nouvelle réservation</a>
+    <div class="flex flex-row justify-between w-3/4 mx-auto">
+        <a href="{{ path('nouvelle_reservation', {'equipment_id': equipment.id}) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Créer une nouvelle réservation</a>
+        <a href="{{ path('equipment_logs', {'id': equipment.id}) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Voir historique</a>
         <form action="{{ path('equipment_modify_status', {'id': equipment.id}) }}" method="post">
             <select id="status" name="status" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-4">
                 {% for statut in allStatus %}
@@ -22,36 +23,37 @@
             {% endif %}
         </form>
     </div>
+    <button id="reloadButton" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mx-auto rounded mt-4" onclick="location.reload()">Recharger la page si le calendrier ne s'affiche pas</button>
 {% endblock %}
 
 {% block javascripts %}
-        <script src='{{ asset('js/fullcalendar/index.global.min.js')}}'></script>
-        <script>
+    <script src='{{ asset('js/fullcalendar/index.global.min.js')}}'></script>
+    <script>
+        var calendarEl = document.createElement('div');
+        calendarEl.id = 'calendar';
+        calendarEl.classList.add('sm:m-8', 'bg-blue-400', 'rounded-md', 'p-6');
+        document.body.appendChild(calendarEl);
 
-            var calendarEl = document.createElement('div');
-            calendarEl.id = 'calendar';
-            calendarEl.classList.add('sm:m-8', 'bg-blue-400', 'rounded-md', 'p-6');
-            document.body.appendChild(calendarEl);
-
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'multiMonthYear',
-                eventSources: [
-                    {
-                        events: [ 
-                            {% for loan in loans %}
-                                {
-                                    title  : '{{ loan.borrower.BorrowerName }}',
-                                    start  : '{{ loan.startDate|date('Y-m-d') }}',
-                                    end    : '{{ loan.endDate|date('Y-m-d') }}',
-                                    url   : "{{ path('borrower_show', {'id': loan.borrower.id, 'selected_loan_id': loan.id}) }}",
-                                },
-                            {% endfor %}
-                        ]
-                    }
-                ]
-            });
-            calendar.render();
-
-        </script>
-    {% endblock %}
-
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'multiMonthYear',
+            eventSources: [
+                {
+                    events: [ 
+                        {% for loan in loans %}
+                            {
+                                title  : '{{ loan.borrower.BorrowerName }}',
+                                start  : '{{ loan.startDate|date('Y-m-d') }}',
+                                end    : '{{ loan.endDate|date('Y-m-d') }}',
+                                url   : "{{ path('borrower_show', {'id': loan.borrower.id, 'selected_loan_id': loan.id}) }}",
+                            },
+                        {% endfor %}
+                    ]
+                }
+            ],
+            datesSet: function() {
+                document.getElementById('reloadButton').style.display = 'none';
+            }
+        });
+        calendar.render();
+    </script>
+{% endblock %}

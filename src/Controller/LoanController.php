@@ -8,90 +8,77 @@ use App\Entity\Customer;
 use App\Entity\Employee;
 use App\Entity\Equipment;
 use App\Entity\BorrowerType;
-use App\Repository\LoanRepository;
+use App\Entity\EquipmentLogs;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('/loan')]
+#[Route('/pret')]
 final class LoanController extends AbstractController
 {
-    #[Route(name: 'app_loan_index', methods: ['GET'])]
-    public function index(LoanRepository $loanRepository): Response
-    {
-        return $this->render('loan/index.html.twig', [
-            'loans' => $loanRepository->findAll(),
-        ]);
-    }
-
-    #[Route('/new', name: 'app_loan_new', methods: ['GET', 'POST'])]
+    #[Route('/reservation', name: 'nouvelle_reservation', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $equipment = $entityManager->getRepository(Equipment::class)->find($request->get('equipment_id'));
+        if ($request->isMethod('GET')) {
+            return $this->render('loan/new.html.twig', [
+                'equipment' => $entityManager->getRepository(Equipment::class)->find($request->get('equipment_id')),
+                'customers' => $entityManager->getRepository(Customer::class)->findAll(),
+                'employees' => $entityManager->getRepository(Employee::class)->findAll(),
+                'employee' => $this->getUser(),
+            ]);
+        }
 
-        $startDate = $request->get('startDate');
-        $endDate = $request->get('endDate');
+        if (!$request->request->get('start_date') || !$request->request->get('end_date')) {
+            return $this->redirectToRoute('nouvelle_reservation', ['equipment_id' => $request->get('equipment_id')]);
+        }
+        if (new \DateTime($request->request->get('start_date')) > new \DateTime($request->request->get('end_date'))) {
+            return $this->redirectToRoute('nouvelle_reservation', ['equipment_id' => $request->get('equipment_id')]);
+        }
 
-        if ($startDate && $endDate) {
-            $loan = new Loan();
-            $loan->setEquipment($equipment);
-            $loan->setStartDate(new \DateTime($startDate));
-            $loan->setEndDate(new \DateTime($endDate));
-            if ($request->get('typeBorrower') == 'customer') {
-                $customer = null;
-                if ($request->get('customerSelect') == 'default') {
-                    $customer = new Customer();
-                    $customer->setFirstName($request->get('firstName'));
-                    $customer->setLastName($request->get('lastName'));
-                    $customer->setPhone($request->get('phone'));
-                    $entityManager->persist($customer);
+        $loan = new Loan();
+        $loan->setStartDate(new \DateTime($request->request->get('start_date')));
+        $loan->setEndDate(new \DateTime($request->request->get('end_date')));
 
-                    $borrower = new Borrower();
-                    $borrower->setType($entityManager->getRepository(BorrowerType::class)->findBy(['name' => 'customer'])[0]);
-                    $borrower->setCustomer($customer);
-                    $customer->setBorrower($borrower);
-                    $entityManager->persist($borrower);
-                    $entityManager->flush();
-                } else {
-                    $customer = $entityManager->getRepository(Customer::class)->find($request->get('customerSelect'));
-                }
-                $loan->setBorrower($customer->getBorrower());
-            } else if ($request->get('typeBorrower') == 'employee') {
-                $employee = $entityManager->getRepository(Employee::class)->find($request->get('employeeSelect'));
-                $loan->setBorrower($employee->getBorrower());
+        $borrowerType = $request->request->get('borrower_type');
+        if ($borrowerType === 'employee') {
+            $employee = $entityManager->getRepository(Employee::class)->find($request->request->get('employee'));
+            $loan->setBorrower($employee->getBorrower());
+        } elseif ($borrowerType === 'customer') {
+            $customerChoice = $request->request->get('customer_choice');
+            if ($customerChoice === 'select') {
+                $customer = $entityManager->getRepository(Customer::class)->find($request->request->get('customer'));
+                $borrower = $customer->getBorrower();
+                $loan->setBorrower($borrower);
+            } elseif ($customerChoice === 'create') {
+                $customer = new Customer();
+                $customer->setFirstName($request->request->get('customer_first_name'));
+                $customer->setLastName($request->request->get('customer_last_name'));
+                $customer->setPhone($request->request->get('customer_phone'));
+                $entityManager->persist($customer);
+
+                $borrower = new Borrower();
+                $borrower->setType($entityManager->getRepository(BorrowerType::class)->findOneBy(['name' => 'Customer']));
+                $entityManager->persist($borrower);
+                $customer->setBorrower($borrower);
+                $loan->setBorrower($borrower);
             }
-            $entityManager->persist($loan);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_equipment_show', ['id' => $equipment->getId(), 'succes' => 'La réservation pour le produit a été ajoutée avec succès.'], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('loan/new.html.twig', [
-            'equipment' => $equipment,
-            'customers' => $entityManager->getRepository(Customer::class)->findAll(),
-            'employees' => $entityManager->getRepository(Employee::class)->findAll(),
-            'employee' => $this->getUser(),
-        ]);
-    }
+        $equipment = $entityManager->getRepository(Equipment::class)->find($request->request->get('equipment_id'));
+        $loan->setEquipment($equipment);
 
-    #[Route('/{id}', name: 'app_loan_show', methods: ['GET'])]
-    public function show(Loan $loan): Response
-    {
-        return $this->render('loan/show.html.twig', [
-            'loan' => $loan,
-        ]);
-    }
+        $log = new EquipmentLogs();
+        $log->setEquipment($equipment);
+        $log->setAction('Nouveau prêt');
+        $log->setCreatedAt(new \DateTimeImmutable());
+        $log->setStock($equipment->getStockQuantity());
+        $entityManager->persist($log);
 
-    #[Route('/{id}', name: 'app_loan_delete', methods: ['POST'])]
-    public function delete(Request $request, Loan $loan, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$loan->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($loan);
-            $entityManager->flush();
-        }
+        $entityManager->persist($loan);
+        $entityManager->flush();
 
-        return $this->redirectToRoute('app_loan_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('borrower_show', ['id' => $loan->getBorrower()->getId()]);
     }
 }

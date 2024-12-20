@@ -4,33 +4,32 @@
 
 {% block body %}
     <h1 class="text-5xl text-center py-4">Réservations de {{ borrower.BorrowerName }}</h1>
+    <button id="recharger" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="location.reload();">Recharger la page si le calendrier ne s'affiche pas</button>
+    <script src='{{ asset('js/fullcalendar/index.global.min.js') }}'></script>
+    <script>
+        var calendarEl = document.createElement('div');
+        calendarEl.id = 'calendar';
+        calendarEl.classList.add('sm:m-8', 'bg-blue-400', 'rounded-md', 'p-6');
+        document.body.appendChild(calendarEl);
+
+        if (calendarEl) {
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'multiMonthYear',
+                eventSources: [{
+                    events: [
+            {% for loan in loans %}
+                {
+                    title  : '{{ loan.equipment.name }}',
+                    start  : '{{ loan.startDate|date('Y-m-d') }}',
+                    end    : '{{ loan.endDate|date('Y-m-d') }}',
+                    url    : "{{ path('interface_equipement', {'id': loan.equipment.id}) }}"
+                },
+            {% endfor %}
+        ]
+                }]
+            });
+            document.getElementById('recharger').style.display = 'none';
+            calendar.render();
+        }
+    </script>
 {% endblock %}
-
-{% block javascripts %}
-<script src='{{ asset('js/fullcalendar/index.global.min.js') }}'></script>
-        <script>
-            var calendarEl = document.createElement('div');
-            calendarEl.id = 'calendar';
-            calendarEl.classList.add('sm:m-8', 'bg-blue-400', 'rounded-md', 'p-6');
-            document.body.appendChild(calendarEl);
-
-            if (calendarEl) {
-                var calendar = new FullCalendar.Calendar(calendarEl, {
-                    initialView: 'multiMonthYear',
-                    eventSources: [{
-                        events: [
-                {% for loan in loans %}
-                    {
-                        title  : '{{ loan.equipment.name }}',
-                        start  : '{{ loan.startDate|date('Y-m-d') }}',
-                        end    : '{{ loan.endDate|date('Y-m-d') }}',
-                        url    : "{{ path('app_equipment_show', {'id': loan.equipment.id}) }}"
-                    },
-                {% endfor %}
-            ]
-                    }]
-                });
-                calendar.render();
-            }
-        </script>
-    {% endblock %}

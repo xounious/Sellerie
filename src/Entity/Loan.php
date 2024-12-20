@@ -38,6 +38,11 @@ class Loan
         return $this->startDate;
     }
 
+    public function getStartDateFormatted(): string
+    {
+        return $this->startDate->format('d/m/Y');
+    }
+
     public function setStartDate(\DateTimeInterface $startDate): static
     {
         $this->startDate = $startDate;
@@ -48,6 +53,11 @@ class Loan
     public function getEndDate(): ?\DateTimeInterface
     {
         return $this->endDate;
+    }
+
+    public function getEndDateFormatted(): string
+    {
+        return $this->endDate->format('d/m/Y');
     }
 
     public function setEndDate(?\DateTimeInterface $endDate): static

@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rendre un équipement{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto p-6 w-1/2">
+        <h1 class="text-2xl font-bold mb-6">Rendre l'équipement {{ equipment.name }}</h1>
+        <form method="POST" action="{{ path('rendre_un_equipement', {id: equipment.id}) }}">
+            <div class="mb-4">
+                <label for="loan" class="block text-gray-700 text-sm font-bold mb-2">Choisir un emprunteur:</label>
+                <select id="loan" name="loan" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    {% for loan in loans %}
+                        <option value="{{ loan.id }}">{{ loan.borrower.borrowerName }} De {{ loan.startDateFormatted }} à {{ loan.endDateFormatted }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Rendre l'équipement
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

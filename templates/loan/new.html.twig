@@ -1,85 +1,103 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Loan{% endblock %}
+{% block title %}Nouvel emprunt{% endblock %}
 
 {% block body %}
-    <h1>Emprunter {{equipment.name}}</h1>
-    <p>Description</p>
-    <p>{{equipment.description}}</p>
-    <form method="get" action="{{path('app_loan_new')}}">
-        <div id="date">
-            <h2>Date d'emprunt</h2>
-            <label for="startDate">Date de début</label>
-            <input type="date" name="startDate" id="startDate">
-            <label for="endDate">Date de fin</label>
-            <input type="date" name="endDate" id="endDate">
-        </div>
-        <h2>L'emprunteur</h2>
+    <script>
+        function toggleBorrowerFields() {
+            var borrowerType = document.getElementById('borrower_type').value;
+            var employeeSelect = document.getElementById('employee_select');
+            var customerSelect = document.getElementById('customer_select');
+            var newClientForm = document.getElementById('new_customer_form');
+            var customerChoice = document.getElementById('customer_choice');
+
+            employeeSelect.style.display = 'none';
+            customerSelect.style.display = 'none';
+            newClientForm.style.display = 'none';
+            customerChoice.style.display = 'none';
+
+            if (borrowerType === 'employee') {
+                employeeSelect.style.display = 'block';
+            } else if (borrowerType === 'customer') {
+                customerChoice.style.display = 'block';
+            }
+        }
+
+        function toggleCustomerFields() {
+            var customerChoice = document.getElementById('customer_choice_select').value;
+            var customerSelect = document.getElementById('customer_select');
+            var newClientForm = document.getElementById('new_customer_form');
+
+            customerSelect.style.display = 'none';
+            newClientForm.style.display = 'none';
+
+            if (customerChoice === 'select') {
+                customerSelect.style.display = 'block';
+            } else if (customerChoice === 'create') {
+                newClientForm.style.display = 'block';
+            }
+        }
+    </script>
+    <h1 class="text-2xl font-bold mb-4 w-fit mx-auto">Créer un nouveau prêt pour {{ equipment.name }}</h1>
+    <form action="{{ path('nouvelle_reservation') }}" method="POST" class="space-y-4 w-1/2 mx-auto">
         <input type="hidden" name="equipment_id" value="{{ equipment.id }}">
-        <label for="typeBorrower">Type d'emprunteur</label>
-        <select name="typeBorrower" id="typeBorrower">
-            <option value="customer" selected>Client</option>
-            <option value="employee">Employé</option>
-        </select>
-
-        <div id="customer">
-            <h2>Selectionner un client existant</h2>
-            <label for="customerSelect">Selectionnez</label>
-            <select name="customerSelect" id="customerSelect">
-                <option value="default" default>Pas de client selectionné</option>
+        <div>
+            <label for="start_date" class="block text-sm font-medium text-gray-700">Date de début:</label>
+            <input type="date" id="start_date" name="start_date" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-1">
+        </div>
+        <div>
+            <label for="end_date" class="block text-sm font-medium text-gray-700">Date de fin:</label>
+            <input type="date" id="end_date" name="end_date" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-1">
+        </div>
+        <div>
+            <label for="borrower_type" class="block text-sm font-medium text-gray-700">Type d'emprunteur:</label>
+            <select id="borrower_type" name="borrower_type" required onchange="toggleBorrowerFields()" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-1">
+                <option default value="">Sélectionnez un type</option>
+                <option value="employee">Employé</option>
+                <option value="customer">Client</option>
+            </select>
+        </div>
+        <div id="employee_select" style="display: none;">
+            <label for="employee" class="block text-sm font-medium text-gray-700">Sélectionnez un employé:</label>
+            <select id="employee" name="employee" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-1">
+                {% for employee in employees %}
+                    <option value="{{ employee.id }}">{{ employee.firstName }} {{ employee.lastName }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="customer_choice" style="display: none;">
+            <label for="customer_choice" class="block text-sm font-medium text-gray-700">Choisissez une option:</label>
+            <select id="customer_choice_select" name="customer_choice" onchange="toggleCustomerFields()" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-1">
+                <option default value="">Sélectionnez une option</option>
+                <option value="select">Sélectionner un client existant</option>
+                <option value="create">Créer un nouveau client</option>
+            </select>
+        </div>
+        <div id="customer_select" style="display: none;">
+            <label for="customer" class="block text-sm font-medium text-gray-700">Sélectionnez un client:</label>
+            <select id="customer" name="customer" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-1">
                 {% for customer in customers %}
-                    <option value="{{ customer.id }}" firstname="{{ customer.firstname }}" lastname="{{ customer.lastname }}" phone="{{ customer.phone }}">{{ customer.lastname }} {{ customer.firstname }}</option>
-                {% endfor %}
-            </select>
-            <h2>Ou créez un client</h2>
-            <label for="firstname">Prénom</label>
-            <input type="text" name="firstname" id="firstname">
-            <label for="lastname">Nom</label>
-            <input type="text" name="lastname" id="lastname">
-            <label for="phone">Phone</label>
-            <input type="text" name="phone" id="phone">
-        </div>
-
-        <div id="employee" class="hidden">
-            <label for="employeeSelect">Selectionnez</label>
-            <select name="employeeSelect" id="employeeSelect">
-                <option value="default" default>Pas d'employé selectionné</option>
-                <option value="{{ employee.id }}">Vous même</option>
-                {% for employee_ in employees %}
-                    {% if employee != employee_ %}
-                        <option value="{{ employee_.id }}">{{ employee_.lastname }} {{ employee_.firstname }}</option>
-                    {% endif %}
+                    <option value="{{ customer.id }}">{{ customer.firstName }} {{ customer.lastName }}</option>
                 {% endfor %}
             </select>
         </div>
-        <button id="submit" type="submit">Aucun emprunteur selectionné</button>
-        <script>
-            document.querySelector('#typeBorrower').addEventListener('change', function() {
-                if (this.value === 'customer') {
-                    document.querySelector('#customer').classList.remove('hidden');
-                    document.querySelector('#employee').classList.add('hidden');
-                    document.querySelector('#submit').innerHTML = 'Emprunter pour ce client';
-                } else {
-                    document.querySelector('#customer').classList.add('hidden');
-                    document.querySelector('#employee').classList.remove('hidden');
-                    document.querySelector('#submit').innerHTML = 'Emprunter pour cet employé';
-                }
-            });
-            document.querySelector('#customerSelect').addEventListener('change', function() {
-                if (this.value !== 'default') {
-                    let select = document.querySelector('#customerSelect');
-                    document.querySelector('#customer #firstname').value = select.options[select.selectedIndex].getAttribute('firstname');
-                    document.querySelector('#customer #firstname').setAttribute('readonly', 'readonly');
-                    document.querySelector('#customer #lastname').value = select.options[select.selectedIndex].getAttribute('lastname');
-                    document.querySelector('#customer #lastname').setAttribute('readonly', 'readonly');
-                    document.querySelector('#customer #phone').value = select.options[select.selectedIndex].getAttribute('phone');
-                    document.querySelector('#customer #phone').setAttribute('readonly', 'readonly');
-                    document.querySelector('#submit').innerHTML = 'Emprunter pour le client selectionné';
-                } else {
-                    document.querySelector('#submit').innerHTML = 'Emprunter pour un nouveau client et créer ce client';
-                }
-            });
-        </script>
-
-    <a href="{{ path('app_loan_index') }}">back to list</a>
+        <div id="new_customer_form" style="display: none;">
+            <h2 class="text-xl font-bold mb-2">Créer un nouveau client</h2>
+            <div>
+                <label for="customer_first_name" class="block text-sm font-medium text-gray-700">Prénom:</label>
+                <input type="text" id="customer_first_name" name="customer_first_name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-1">
+            </div>
+            <div>
+                <label for="customer_last_name" class="block text-sm font-medium text-gray-700">Nom:</label>
+                <input type="text" id="customer_last_name" name="customer_last_name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-1">
+            </div>
+            <div>
+                <label for="customer_phone" class="block text-sm font-medium text-gray-700">Téléphone:</label>
+                <input type="text" id="customer_phone" name="customer_phone" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-1">
+            </div>
+        </div>
+        <div>
+            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Créer le prêt</button>
+        </div>
+    </form>
 {% endblock %}

@@ -57,12 +57,10 @@ class AdminController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            dd($employee);
             $data = $form->getData();
             $employee->setFirstname($data->getFirstname());
             $employee->setLastname($data->getLastname());
             $employee->setEmail($data->getEmail());
-            dd($employee);
             $entityManager->persist($employee);
             $entityManager->flush();
 
@@ -113,6 +111,41 @@ class AdminController extends AbstractController
             'statistiquesStatus' => $statistiquesStatus,
             'statistiquesStorage' => $statistiquesStorage,
             'statistiquesLoaned' => $statistiquesLoaned,
+            'employee' => $this->getUser(),
+        ]);
+    }
+
+    #[Route('/createEmployee', name: 'app_create_employee', methods: ['GET', 'POST'])]
+    public function createEmployee(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if ($request->isMethod('POST')) {
+            $firstName = $request->request->get('first_name');
+            $lastName = $request->request->get('last_name');
+            $email = $request->request->get('email');
+            $password = $request->request->get('password');
+            $confirmPassword = $request->request->get('confirm_password');
+
+            if ($password !== $confirmPassword) {
+                return $this->render('admin/createEmployee.html.twig', [
+                    'error' => "Les mots de passe ne correspondent pas.",
+                ]);
+            }
+
+            $employee = new Employee();
+            $employee->setFirstname($firstName);
+            $employee->setLastname($lastName);
+            $employee->setEmail($email);
+            $employee->setPassword(password_hash($password, PASSWORD_BCRYPT));
+
+            $entityManager->persist($employee);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_gestion_employees', [
+                'message' => "L'employé a bien été créé.",
+            ]);
+        }
+
+        return $this->render('admin/createEmployee.html.twig', [
             'employee' => $this->getUser(),
         ]);
     }

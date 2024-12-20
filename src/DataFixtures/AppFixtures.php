@@ -12,6 +12,7 @@ use App\Entity\Customer;
 use App\Entity\Employee;
 use App\Entity\Equipment;
 use App\Entity\BorrowerType;
+use App\Entity\EquipmentLogs;
 use App\Entity\EquipmentCategory;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -150,6 +151,13 @@ class AppFixtures extends Fixture
             $equipment->setStockQuantity($faker->numberBetween(0, 10));
             $equipments[] = $equipment;
             $manager->persist($equipment);
+
+            $log = new EquipmentLogs();
+            $log->setEquipment($equipment);
+            $log->setAction('Création équipement');
+            $log->setCreatedAt(new \DateTimeImmutable());
+            $log->setStock($equipment->getStockQuantity());
+            $manager->persist($log);
         }
 
         // ###########################################

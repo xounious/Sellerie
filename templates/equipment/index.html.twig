@@ -1,56 +1,123 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Equipment index{% endblock %}
-{% block stylesheets %}
-    <link rel="https://cdn.datatables.net/2.1.8/css/dataTables.min.css">
-{% endblock %}
+{% block title %}Tous les équipements{% endblock %}
 
 {% block body %}
-    <h1>Equipment index</h1>
-    <div class='flex flex-row '>
-        <a href="{{ path('app_equipment_new') }}">Créer un nouvel équipement</a>
+    <h1 class="text-3xl font-bold mb-4 mx-auto w-fit">Tous les équipements</h1>
+    <div class='flex flex-row mb-4 items-center justify-center'>
+        <a href="{{ path('nouvel_equipement') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Créer un nouvel équipement</a>
     </div>
-    <div class='w-full p-16'>
-        <table class="table display">
+    <div class='w-full p-4'>
+        <div id="pagination" class="mb-4 flex flex-row justify-center gap-4 my-4">
+            <div class="flex flex-row mb-4 items-center justify-center">
+                <label for="filterType" class="mr-2">Filtrer par:</label>
+                <select id="filterType" class="border border-gray-300 p-2 rounded">
+                    <option value="name">Nom</option>
+                    <option value="category">Categorie</option>
+                    <option value="status">État</option>
+                    <option value="storage">Stockage</option>
+                </select>
+            </div>
+            <input type="text" placeholder="Rechercher" class="border border-gray-300 p-2 rounded w-48">
+        </div>
+        <table class="table-auto w-5/6 bg-white shadow-md rounded mx-auto">
             <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Taille</th>
-                    <th>Stock</th>
-                    <th>Categorie</th>
-                    <th>État</th>
-                    <th>Stockage</th>
-                    <th>Actions</th>
+                <tr class="bg-gray-200 text-left">
+                    <th class="px-4 py-2">Nom</th>
+                    <th class="px-4 py-2">Taille</th>
+                    <th class="px-4 py-2">Stock</th>
+                    <th class="px-4 py-2">Categorie</th>
+                    <th class="px-4 py-2">État</th>
+                    <th class="px-4 py-2">Stockage</th>
+                    <th class="px-4 py-2">Interface</th>
                 </tr>
             </thead>
             <tbody>
             {% for equipment in equipments %}
-                <tr>
-                    <td>{{ equipment.name }}</td>
-                    <td>{{ equipment.size }}</td>
-                    <td>{{ equipment.stockQuantity }}</td>
-                    <td>{{ equipment.category.name }}</td>
-                    <td>{{ equipment.status.name }}</td>
+                <tr class="border-t">
+                    <td class="px-4 py-2">{{ equipment.name }}</td>
+                    <td class="px-4 py-2">{{ equipment.size }}</td>
+                    <td class="px-4 py-2">{{ equipment.stockQuantity }}</td>
+                    <td class="px-4 py-2">{{ equipment.category.name }}</td>
+                    <td class="px-4 py-2">{{ equipment.status.name }}</td>
                     {% if equipment.storage %}
-                        <td>{{ equipment.storage.building.name }} - Rayon {{ equipment.storage.laneNumber}}</td>
+                        <td class="px-4 py-2">{{ equipment.storage.building.name }} {{ equipment.storage.laneLetter}}{{ equipment.storage.laneNumber}}</td>
                     {% else %}
-                        <td>Pas de stockage</td>
+                        <td class="px-4 py-2">Pas de stockage</td>
                     {% endif %}
-                    <td>
-                        <a href="{{ path('app_equipment_show', {'id': equipment.id}) }}">Acceder à l'interface de cet equipement</a>
+                    <td class="px-4 py-2">
+                        <a href="{{ path('interface_equipement', {'id': equipment.id}) }}" class="text-blue-500 hover:underline">Réservations</a>
+                        <a href="{{ path('rendre_un_equipement', {'id': equipment.id}) }}" class="text-blue-500 hover:underline">Retour</a>
+                        <a href="{{ path('equipment_logs', {'id': equipment.id}) }}" class="text-blue-500 hover:underline">Historique</a>
                     </td>
+                </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
-{% endblock %}
-
-{% block javascripts %}
-    <script src='https://code.jquery.com/jquery-3.7.1.js'></script>
-    <script src='https://cdn.datatables.net/2.1.8/js/dataTables.min.js'></script>
-    <script src='https://cdn.datatables.net/2.1.8/js/dataTables.tailwindcss.js'></script>
-    <script src='https://cdn.tailwindcss.com/'></script>
     <script>
-        var table = new DataTable('.table');
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('tbody tr');
+            let currentPage = 1;
+
+            function displayRows() {
+                rows.forEach((row, index) => {
+                    row.style.display = (index >= (currentPage - 1) * 10 && index < currentPage * 10) ? 'table-row' : 'none';
+                });
+            }
+
+            function createPagination() {
+                let pagination = document.querySelector('#pagination');
+                for (let i = 1; i <= Math.ceil(rows.length / 10); i++) {
+                    const button = document.createElement('button');
+                    button.textContent = i;
+                    button.className = 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-1';
+                    button.addEventListener('click', () => {
+                        currentPage = i;
+                        displayRows();
+                    });
+                    pagination.appendChild(button);
+                }
+            }
+
+            function createSearchFilter() {
+                let searchInput = document.querySelector('#pagination input');
+                let filterType = document.querySelector('#filterType');
+                
+                searchInput.addEventListener('input', filterRows);
+                filterType.addEventListener('change', filterRows);
+
+                function filterRows() {
+                    let text = searchInput.value.toLowerCase();
+                    let type = filterType.value;
+                    let filteredRows = Array.from(rows).filter(row => {
+                        let cell;
+                        switch (type) {
+                            case 'name':
+                                cell = row.querySelector('td:nth-child(1)');
+                                break;
+                            case 'category':
+                                cell = row.querySelector('td:nth-child(4)');
+                                break;
+                            case 'status':
+                                cell = row.querySelector('td:nth-child(5)');
+                                break;
+                            case 'storage':
+                                cell = row.querySelector('td:nth-child(6)');
+                                break;
+                            default:
+                                cell = row.querySelector('td:first-child');
+                        }
+                        return cell.textContent.toLowerCase().includes(text);
+                    });
+                    rows.forEach(row => row.style.display = 'none');
+                    filteredRows.slice(0, 10).forEach(row => row.style.display = 'table-row');
+                }
+            }
+
+            displayRows();
+            createPagination();
+            createSearchFilter();
+        });
     </script>
 {% endblock %}
